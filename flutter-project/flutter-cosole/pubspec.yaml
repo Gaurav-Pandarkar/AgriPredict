@@ -11,9 +11,12 @@ dependencies:
     sdk: flutter
   font_awesome_flutter: ^10.3.0 # Font Awesome icons for UI
   intl: ^0.18.0 # For internationalization and formatting
-  image_picker: ^0.8.6 # For image selection (used in disease prediction via image uploads)
-  animated_text_kit: ^4.2.1 # Optional for animated text effects in the app
+  #  image_picker: ^0.8.4+10
+  # permission_handler: ^10.0.0 # Optional for animated text effects in the app
   # http: ^0.15.0 # For making HTTP requests (e.g., to fetch weather data)
+
+  permission_handler: ^10.2.0 # Use the latest stable version
+  image_picker: ^0.8.7+3
 
 dev_dependencies:
   flutter_test:

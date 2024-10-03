@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'multilanguage_support.dart';
+
 class StartApplication extends StatefulWidget {
   @override
   _StartApplicationState createState() => _StartApplicationState();
@@ -14,12 +15,14 @@ class _StartApplicationState extends State<StartApplication>
   @override
   void initState() {
     super.initState();
+
     // Navigate to the multilingual support screen after 5 seconds with a smooth transition
     Future.delayed(Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => MultilingualSupport(),
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              MultilingualSupport(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(1.0, 0.0); // Slide in from the right
             const end = Offset.zero;
