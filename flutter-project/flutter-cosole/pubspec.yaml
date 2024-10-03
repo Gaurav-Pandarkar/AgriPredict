@@ -1,14 +1,19 @@
-name: flutter_application_2
-description: A new Flutter project.
-publish_to: 'none'
+name: ai_crop_disease_system
+description: An AI-driven crop disease prediction and management system.
+publish_to: "none" # Keep this line if you're not publishing to pub.dev
 version: 0.1.0
 
 environment:
-  sdk: '>=3.0.6 <4.0.0'
+  sdk: ">=3.0.6 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  font_awesome_flutter: ^10.3.0 # Font Awesome icons for UI
+  intl: ^0.18.0 # For internationalization and formatting
+  image_picker: ^0.8.6 # For image selection (used in disease prediction via image uploads)
+  animated_text_kit: ^4.2.1 # Optional for animated text effects in the app
+  # http: ^0.15.0 # For making HTTP requests (e.g., to fetch weather data)
 
 dev_dependencies:
   flutter_test:
@@ -17,3 +22,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/Agriculture-Logo-Clipart-PNG.png # Your app's logo
+    # Uncomment and add any additional assets as needed, like logos or user/weather icons
+    # - assets/logo.png
+    # - assets/user.png
+    # - assets/weather_icon.png
