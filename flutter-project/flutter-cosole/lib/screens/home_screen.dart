@@ -1,6 +1,66 @@
+// working properly
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 import 'input_capture.dart';
-import 'taskbar.dart'; // Import the Taskbar widget
+import 'taskbar.dart';
+
+Map<String, String> weatherCodeDescriptions = {
+  "1000": "Clear",
+  "1100": "Mostly Clear",
+  "1101": "Partly Cloudy",
+  "1102": "Mostly Cloudy",
+  "1001": "Cloudy",
+  "2000": "Fog",
+  "2100": "Light Fog",
+  "3000": "Light Wind",
+  "3001": "Wind",
+  "3002": "Strong Wind",
+  "4000": "Drizzle",
+  "4001": "Rain",
+  "4200": "Light Rain",
+  "4201": "Heavy Rain",
+  "5000": "Snow",
+  "5001": "Flurries",
+  "5100": "Light Snow",
+  "5101": "Heavy Snow",
+  "6000": "Freezing Drizzle",
+  "6001": "Freezing Rain",
+  "6200": "Light Freezing Rain",
+  "6201": "Heavy Freezing Rain",
+  "7000": "Ice Pellets",
+  "7101": "Heavy Ice Pellets",
+  "7102": "Light Ice Pellets",
+  "8000": "Thunderstorm",
+};
+
+Future<String?> fetchCityName(double latitude, double longitude) async {
+  final String apiKey =
+      '07add8ab81c84173b7e0cf8364eb52a7'; // Replace with your actual API key
+  final String url =
+      'https://api.opencagedata.com/geocode/v1/json?q=$latitude,$longitude&key=$apiKey';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      // Extracting _normalized_city from the JSON response
+      final normalizedCity =
+          jsonResponse['results'][0]['components']['_normalized_city'];
+      return normalizedCity; // Return the city name
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+    }
+  } catch (e) {
+    print('Error occurred: $e');
+  }
+
+  return null; // Return null if there is an error or no city name found
+}
 
 class Weather {
   final String cityName;
@@ -12,14 +72,6 @@ class Weather {
     required this.temperature,
     required this.weatherDescription,
   });
-
-  static Weather fakeWeather() {
-    return Weather(
-      cityName: "Pune",
-      temperature: 30.0,
-      weatherDescription: "Partly Cloudy",
-    );
-  }
 }
 
 class HomeScreen extends StatefulWidget {
@@ -28,21 +80,124 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<Weather> weather;
-  double cropBoxScale = 1.0; // Scale for crop box hover effect
-  double weatherBoxScale = 1.0; // Scale for weather box hover effect
+  Future<Weather>? weather;
+  double cropBoxScale = 1.0;
+  double weatherBoxScale = 1.0;
+  String? errorMessage;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    weather = Future.delayed(Duration(seconds: 2), () => Weather.fakeWeather());
+    fetchWeather();
   }
 
-  void refreshWeather() {
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showLocationDialog();
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
+  Future<void> _openLocationSettings() async {
+    await Geolocator.openLocationSettings();
+  }
+
+  void _showLocationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Location Services Disabled'),
+        content: Text(
+            'Location services are disabled. Please enable them in the settings.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _openLocationSettings();
+            },
+            child: Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> fetchWeather() async {
+    const String apiKey = 'WpNtxK3NOLZ4syiiroDQd6VMBROiNPi0';
     setState(() {
-      weather =
-          Future.delayed(Duration(seconds: 2), () => Weather.fakeWeather());
+      isLoading = true;
     });
+
+    try {
+      Position position = await _determinePosition();
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+
+      // Fetch city name using latitude and longitude
+      String? cityName = await fetchCityName(latitude, longitude);
+
+      final String apiUrl =
+          'https://api.tomorrow.io/v4/weather/realtime?location=$latitude,$longitude&apikey=$apiKey';
+
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        await Future.delayed(Duration(seconds: 2));
+
+        setState(() {
+          // Fetch and map the weather code
+          String rawWeatherCode =
+              data['data']['values']['weatherCode']?.toString() ?? 'Unknown';
+          String weatherDescription =
+              weatherCodeDescriptions[rawWeatherCode] ?? 'Unknown';
+
+          weather = Future.value(Weather(
+            cityName: cityName ?? 'Unknown Location', // Use fetched city name
+            temperature:
+                (data['data']['values']['temperature'] as num).toDouble(),
+            weatherDescription:
+                weatherDescription, // Use the mapped description
+          ));
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Failed to load weather data: ${response.statusCode}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error: $e';
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -81,151 +236,147 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(color: Colors.green[100]),
         child: Column(
           children: [
-            SizedBox(height: 8), // Small gap between AppBar and boxes
+            SizedBox(height: 8),
 
-            // Crop box with animation and hover effect
             GestureDetector(
-              onTap: () {}, // You can add any functionality on tap
+              onTap: () {},
               onHorizontalDragUpdate: (details) {
-                // Allow dragging the crop box
                 setState(() {
                   cropBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
                 });
               },
               onHorizontalDragEnd: (details) {
                 setState(() {
-                  cropBoxScale = 1.0; // Reset scale after drag
+                  cropBoxScale = 1.0;
                 });
               },
               child: AnimatedScale(
                 scale: cropBoxScale,
                 duration: Duration(milliseconds: 200),
-                child: MajorCropsSection(), // Add the crop section here
+                child: MajorCropsSection(),
               ),
             ),
             SizedBox(height: 20),
 
-            // Weather box with animation and hover effect
             GestureDetector(
-              onTap: refreshWeather, // Refresh the weather data
+              onTap: fetchWeather,
               onHorizontalDragUpdate: (details) {
-                // Allow dragging the weather box
                 setState(() {
                   weatherBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
                 });
               },
               onHorizontalDragEnd: (details) {
                 setState(() {
-                  weatherBoxScale = 1.0; // Reset scale after drag
+                  weatherBoxScale = 1.0;
                 });
               },
               child: AnimatedScale(
                 scale: weatherBoxScale,
                 duration: Duration(milliseconds: 200),
-                child: FutureBuilder<Weather>(
-                  future: weather,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      final weatherData = snapshot.data!;
-                      return AnimatedContainer(
-                        duration:
-                            Duration(milliseconds: 300), // Animation duration
-                        curve: Curves.easeInOut, // Animation curve
-                        width: 250, // Adjusted width
-                        height: 100, // Adjusted height for the weather box
-                        padding: EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200], // Whitish-gray inner color
-                          borderRadius:
-                              BorderRadius.circular(15), // Rounded box
-                          border: Border.all(
-                            color: Colors.blue, // Blue border
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 4,
-                              offset: Offset(2, 2), // Shadow position
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment
-                              .spaceEvenly, // Align horizontally
-                          children: [
-                            Image.network(
-                              'https://uxwing.com/wp-content/themes/uxwing/download/weather/weather-icon.png', // Weather icon
-                              height: 40,
-                              width: 40,
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '${weatherData.cityName}',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                          Colors.black87), // Darker text color
+                child: isLoading
+                    ? CircularProgressIndicator()
+                    : FutureBuilder<Weather>(
+                        future: weather,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else if (snapshot.hasData) {
+                            final weatherData = snapshot.data!;
+                            return AnimatedContainer(
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                              width: 250,
+                              height: 100,
+                              padding: EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: Colors.blue,
+                                  width: 2,
                                 ),
-                                Text(
-                                  '${weatherData.temperature} °C',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(2, 2),
                                   ),
-                                ),
-                                Text(
-                                  '${weatherData.weatherDescription}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black54,
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Image.network(
+                                    'https://uxwing.com/wp-content/themes/uxwing/download/weather/weather-icon.png',
+                                    height: 40,
+                                    width: 40,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                  },
-                ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        weatherData.cityName,
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87),
+                                      ),
+                                      Text(
+                                        '${weatherData.temperature} °C',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      Text(
+                                        weatherData.weatherDescription,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Text('No data available');
+                          }
+                        },
+                      ),
               ),
             ),
+            SizedBox(height: 10),
 
-            SizedBox(height: 20), // Spacing before the image capture section
-
-            // Add ImageCaptureSection here
-            ImageCaptureSection(), // Integrate the image capture section here
+            // Image Capture Section
+            ImageCaptureSection(),
           ],
         ),
       ),
       bottomNavigationBar: Taskbar(
-        // Add the Taskbar here
-        currentIndex: 0, // Set the current index as needed
+        currentIndex: 0,
         onTap: (index) {
-          // Handle the tap on the taskbar
-          // You can implement navigation to the respective screens based on the index
           switch (index) {
             case 0:
-              Navigator.pushNamed(context, '/home'); // Home
-              break;
+              break; // Already on home screen
             case 1:
-              Navigator.pushNamed(context, '/selfnotes'); // SelfNotes
+              Navigator.pushNamed(
+                  context, '/diseasePredict'); // Navigate to Disease Prediction
               break;
             case 2:
-              Navigator.pushNamed(context, '/agronomist'); // Agronomist
+              Navigator.pushNamed(
+                  context, '/manageCrops'); // Navigate to Manage Crops
               break;
             case 3:
-              Navigator.pushNamed(context, '/profile'); // Profile
+              Navigator.pushNamed(context, '/settings'); // Navigate to Settings
               break;
           }
         },

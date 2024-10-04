@@ -29,8 +29,24 @@ class _ImageCaptureSectionState extends State<ImageCaptureSection> {
   }
 
   // Method to request gallery permission and pick image
+  // Future<void> _pickImageFromGallery() async {
+  //   var status = await Permission.photos.request();
+  //   if (status.isGranted) {
+  //     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  //     if (image != null) {
+  //       _processImage(
+  //           File(image.path)); // Process the image without displaying it
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Gallery access is denied.')),
+  //     );
+  //   }
+  // }
+
+  // Method to request gallery permission and pick image
   Future<void> _pickImageFromGallery() async {
-    var status = await Permission.photos.request();
+    var status = await Permission.storage.request(); // Use storage permission
     if (status.isGranted) {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if (image != null) {
