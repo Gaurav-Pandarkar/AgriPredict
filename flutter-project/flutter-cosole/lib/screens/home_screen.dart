@@ -85,10 +85,14 @@ class _HomeScreenState extends State<HomeScreen> {
   double weatherBoxScale = 1.0;
   String? errorMessage;
   bool isLoading = true;
+  int _currentIndex = 0;
+  late AnimationController _appBarController;
+  late AnimationController _taskbarController;
 
   @override
   void initState() {
     super.initState();
+
     fetchWeather();
   }
 
@@ -202,186 +206,181 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 100,
-        backgroundColor: Colors.green[800],
-        elevation: 5,
-        title: Row(
-          children: [
-            ClipOval(
-              child: Image.network(
-                'https://www.pngplay.com/wp-content/uploads/6/Agriculture-Logo-Clipart-PNG.png',
-                height: 70,
-                width: 70,
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(width: 10),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return WillPopScope(
+        onWillPop: () async {
+          // Return false to prevent navigating back
+          return false;
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 100,
+            backgroundColor: Colors.green[800],
+            automaticallyImplyLeading: false,
+            elevation: 5,
+            title: Row(
               children: [
-                Text('AgriPredict',
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white)),
+                ClipOval(
+                  child: Image.network(
+                    'https://www.pngplay.com/wp-content/uploads/6/Agriculture-Logo-Clipart-PNG.png',
+                    height: 70,
+                    width: 70,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('AgriPredict',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
+                  ],
+                ),
               ],
             ),
-          ],
-        ),
-      ),
-      body: Container(
-        decoration: BoxDecoration(color: Colors.green[100]),
-        child: Column(
-          children: [
-            SizedBox(height: 8),
+          ),
+          body: Container(
+            decoration: BoxDecoration(color: Colors.green[100]),
+            child: Column(
+              children: [
+                SizedBox(height: 8),
 
-            GestureDetector(
-              onTap: () {},
-              onHorizontalDragUpdate: (details) {
-                setState(() {
-                  cropBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
-                });
-              },
-              onHorizontalDragEnd: (details) {
-                setState(() {
-                  cropBoxScale = 1.0;
-                });
-              },
-              child: AnimatedScale(
-                scale: cropBoxScale,
-                duration: Duration(milliseconds: 200),
-                child: MajorCropsSection(),
-              ),
-            ),
-            SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {},
+                  onHorizontalDragUpdate: (details) {
+                    setState(() {
+                      cropBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
+                    });
+                  },
+                  onHorizontalDragEnd: (details) {
+                    setState(() {
+                      cropBoxScale = 1.0;
+                    });
+                  },
+                  child: AnimatedScale(
+                    scale: cropBoxScale,
+                    duration: Duration(milliseconds: 200),
+                    child: MajorCropsSection(),
+                  ),
+                ),
+                SizedBox(height: 20),
 
-            GestureDetector(
-              onTap: fetchWeather,
-              onHorizontalDragUpdate: (details) {
-                setState(() {
-                  weatherBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
-                });
-              },
-              onHorizontalDragEnd: (details) {
-                setState(() {
-                  weatherBoxScale = 1.0;
-                });
-              },
-              child: AnimatedScale(
-                scale: weatherBoxScale,
-                duration: Duration(milliseconds: 200),
-                child: isLoading
-                    ? CircularProgressIndicator()
-                    : FutureBuilder<Weather>(
-                        future: weather,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return CircularProgressIndicator();
-                          } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
-                          } else if (snapshot.hasData) {
-                            final weatherData = snapshot.data!;
-                            return AnimatedContainer(
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                              width: 250,
-                              height: 100,
-                              padding: EdgeInsets.all(16.0),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(
-                                  color: Colors.blue,
-                                  width: 2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 4,
-                                    offset: Offset(2, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Image.network(
-                                    'https://uxwing.com/wp-content/themes/uxwing/download/weather/weather-icon.png',
-                                    height: 40,
-                                    width: 40,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        weatherData.cityName,
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87),
-                                      ),
-                                      Text(
-                                        '${weatherData.temperature} °C',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      Text(
-                                        weatherData.weatherDescription,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black54,
-                                        ),
+                GestureDetector(
+                  onTap: fetchWeather,
+                  onHorizontalDragUpdate: (details) {
+                    setState(() {
+                      weatherBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
+                    });
+                  },
+                  onHorizontalDragEnd: (details) {
+                    setState(() {
+                      weatherBoxScale = 1.0;
+                    });
+                  },
+                  child: AnimatedScale(
+                    scale: weatherBoxScale,
+                    duration: Duration(milliseconds: 200),
+                    child: isLoading
+                        ? CircularProgressIndicator()
+                        : FutureBuilder<Weather>(
+                            future: weather,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else if (snapshot.hasData) {
+                                final weatherData = snapshot.data!;
+                                return AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                  width: 250,
+                                  height: 100,
+                                  padding: EdgeInsets.all(16.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                      color: Colors.blue,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 4,
+                                        offset: Offset(2, 2),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Text('No data available');
-                          }
-                        },
-                      ),
-              ),
-            ),
-            SizedBox(height: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Image.network(
+                                        'https://uxwing.com/wp-content/themes/uxwing/download/weather/weather-icon.png',
+                                        height: 40,
+                                        width: 40,
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            weatherData.cityName,
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87),
+                                          ),
+                                          Text(
+                                            '${weatherData.temperature} °C',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            weatherData.weatherDescription,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                return Text('No data available');
+                              }
+                            },
+                          ),
+                  ),
+                ),
+                SizedBox(height: 10),
 
-            // Image Capture Section
-            ImageCaptureSection(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Taskbar(
-        currentIndex: 0,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              break; // Already on home screen
-            case 1:
-              Navigator.pushNamed(
-                  context, '/diseasePredict'); // Navigate to Disease Prediction
-              break;
-            case 2:
-              Navigator.pushNamed(
-                  context, '/manageCrops'); // Navigate to Manage Crops
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/settings'); // Navigate to Settings
-              break;
-          }
-        },
-      ),
-    );
+                // Image Capture Section
+                ImageCaptureSection(),
+              ],
+            ),
+          ),
+          bottomNavigationBar: Taskbar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+          ),
+        ));
   }
 }
 

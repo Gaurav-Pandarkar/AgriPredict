@@ -1,3 +1,7 @@
+import 'package:ai_crop_disease_system/screens/login.dart';
+import 'package:ai_crop_disease_system/screens/otpverify.dart';
+import 'package:ai_crop_disease_system/screens/schedule_consultation.dart';
+import 'package:ai_crop_disease_system/screens/signup.dart';
 import 'package:flutter/material.dart';
 import 'screens/start_application.dart'; // Import the StartApplication widget
 import 'screens/multilanguage_support.dart'; // Import your multilingual support screen
@@ -33,7 +37,14 @@ class _MyAppState extends State<MyApp> {
         '/multilanguage': (context) => MultilingualSupport(),
         '/home': (context) => HomeScreen(),
         '/recommendation': (context) => Recommendation(),
-      },
+        '/self_notes': (context) => SelfNotesScreen(),
+        '/agronomist': (context) => AgronomistScreen(),
+        '/profile': (context) => FarmerProfileScreen(),
+        '/login': (context) => LoginScreen(),
+        '/verifyOtp':(context)=>VerifyOtpScreen(),
+        '/signup':(context)=>SignUpScreen(),
+        '/Schedule':(context)=>ScheduleConsultationScreen()
+      }
     );
   }
 }

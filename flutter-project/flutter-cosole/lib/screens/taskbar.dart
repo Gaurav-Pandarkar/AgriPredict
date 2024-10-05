@@ -46,7 +46,25 @@ class Taskbar extends StatelessWidget {
       ],
       currentIndex: currentIndex,
       selectedItemColor: Colors.green,
-      onTap: onTap,
+      onTap: (index) {
+        onTap(index); // Call the passed function with the index
+        switch (index) {
+          case 0:
+            Navigator.pushNamed(context, '/home'); // Navigate to Home
+            break;
+          case 1:
+            Navigator.pushNamed(
+                context, '/self_notes'); // Navigate to SelfNotes
+            break;
+          case 2:
+            Navigator.pushNamed(
+                context, '/agronomist'); // Navigate to Agronomist
+            break;
+          case 3:
+            Navigator.pushNamed(context, '/profile'); // Navigate to Profile
+            break;
+        }
+      },
     );
   }
 }

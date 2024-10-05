@@ -1,5 +1,6 @@
+import 'package:ai_crop_disease_system/screens/login.dart';
 import 'package:flutter/material.dart';
-import 'multilanguage_support.dart';
+// import 'multilanguage_support.dart';
 
 class StartApplication extends StatefulWidget {
   @override
@@ -17,12 +18,12 @@ class _StartApplicationState extends State<StartApplication>
     super.initState();
 
     // Navigate to the multilingual support screen after 5 seconds with a smooth transition
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(Duration(seconds: 7), () {
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
-              MultilingualSupport(),
+              LoginScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(1.0, 0.0); // Slide in from the right
             const end = Offset.zero;
