@@ -1,0 +1,10 @@
+org\agriopredict\ApplicationMain.class
+org\agriopredict\entity\UserNote.class
+org\agriopredict\dto\request\RegisterUserRequest.class
+org\agriopredict\dto\response\UserNoteResponse.class
+org\agriopredict\entity\RegisterUser.class
+org\agriopredict\dto\request\UserNoteRequest.class
+org\agriopredict\dto\response\RegisterUserResponse.class
+org\agriopredict\repo\RegisterUserRepo.class
+org\agriopredict\repo\UserNoteRepository.class
+org\agriopredict\controller\RegisterLoginUserController.class
