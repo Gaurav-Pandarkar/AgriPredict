@@ -8,8 +8,8 @@
 //       _ScheduleConsultationScreenState();
 // }
 
-// class _ScheduleConsultationScreenState
-//     extends State<ScheduleConsultationScreen> {
+// class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
+//     with SingleTickerProviderStateMixin {
 //   DateTime? selectedDate;
 //   TimeOfDay? selectedTime;
 //   String? selectedRegion;
@@ -61,18 +61,6 @@
 //             ),
 //             SizedBox(height: 20),
 
-//             // Disease Name Field
-//             _buildTextField(
-//               label: 'Disease Name',
-//               icon: Icons.local_hospital,
-//               onChanged: (value) {
-//                 setState(() {
-//                   diseaseName = value;
-//                 });
-//               },
-//             ),
-//             SizedBox(height: 20),
-
 //             // Region Selection Dropdown
 //             _buildDropdownField(
 //               value: selectedRegion,
@@ -87,68 +75,12 @@
 //             ),
 //             SizedBox(height: 20),
 
-//             // Date Picker
-//             _buildDatePickerField(),
-//             SizedBox(height: 20),
-
-//             // Time Picker
-//             _buildTimePickerField(),
-//             SizedBox(height: 20),
-
 //             // Agronomist List
 //             selectedRegion != null && selectedAgronomists.isNotEmpty
 //                 ? _buildAgronomistList()
 //                 : Center(child: Text('No Agronomists Available')),
-
-//             SizedBox(height: 20), // Add some spacing before the button
-
-//             // Submit Button
-//             ElevatedButton(
-//               onPressed: () {
-//                 if (selectedDate != null &&
-//                     selectedTime != null &&
-//                     selectedRegion != null &&
-//                     diseaseName.isNotEmpty) {
-//                   // Handle scheduling logic here
-//                   _showConfirmationDialog();
-//                 } else {
-//                   _showErrorDialog(
-//                       'Please fill all the fields before confirming.');
-//                 }
-//               },
-//               style: ElevatedButton.styleFrom(
-//                 primary: Colors.green.shade600,
-//                 padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(25),
-//                 ),
-//               ),
-//               child: Text(
-//                 'Confirm Schedule',
-//                 style: TextStyle(
-//                   fontSize: 18,
-//                   color: Colors.white,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
 //           ],
 //         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildTextField({
-//     required String label,
-//     required IconData icon,
-//     required ValueChanged<String> onChanged,
-//   }) {
-//     return TextField(
-//       onChanged: onChanged,
-//       decoration: InputDecoration(
-//         labelText: label,
-//         border: OutlineInputBorder(),
-//         prefixIcon: Icon(icon, color: Colors.green),
 //       ),
 //     );
 //   }
@@ -177,45 +109,10 @@
 //     );
 //   }
 
-//   Widget _buildDatePickerField() {
-//     return TextField(
-//       readOnly: true,
-//       onTap: () {
-//         _selectDate(context);
-//       },
-//       decoration: InputDecoration(
-//         labelText: 'Date',
-//         border: OutlineInputBorder(),
-//         prefixIcon: Icon(Icons.calendar_today, color: Colors.green),
-//         hintText: selectedDate != null
-//             ? '${selectedDate!.toLocal()}'.split(' ')[0]
-//             : 'Select Date',
-//       ),
-//     );
-//   }
-
-//   Widget _buildTimePickerField() {
-//     return TextField(
-//       readOnly: true,
-//       onTap: () {
-//         _selectTime(context);
-//       },
-//       decoration: InputDecoration(
-//         labelText: 'Time',
-//         border: OutlineInputBorder(),
-//         prefixIcon: Icon(Icons.access_time, color: Colors.green),
-//         hintText: selectedTime != null
-//             ? '${selectedTime!.hour}:${selectedTime!.minute}'
-//             : 'Select Time',
-//       ),
-//     );
-//   }
-
 //   Widget _buildAgronomistList() {
 //     return ListView.builder(
-//       shrinkWrap: true, // Make the ListView occupy only the space it needs
-//       physics:
-//           NeverScrollableScrollPhysics(), // Disable scrolling for this ListView
+//       shrinkWrap: true,
+//       physics: NeverScrollableScrollPhysics(),
 //       itemCount: selectedAgronomists.length,
 //       itemBuilder: (context, index) {
 //         return _buildAgronomistCard(selectedAgronomists[index]);
@@ -241,17 +138,30 @@
 //               ),
 //             ),
 //             SizedBox(height: 8),
-//             Text('Mobile: ${agronomist.mobile}'),
-//             SizedBox(height: 8),
-//             ElevatedButton(
-//               onPressed: () {
-//                 // Handle consult button click
-//                 _showConsultationDialog(agronomist);
-//               },
-//               child: Text('Consult'),
-//               style: ElevatedButton.styleFrom(
-//                 primary: Colors.green.shade600,
-//               ),
+//             Text('Mobile: ${agronomist.mobile}'), // Fixed typo here
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     // Handle consult button click
+//                     _showConsultationDialog(agronomist);
+//                   },
+//                   child: Text('Consult'),
+//                   style: ElevatedButton.styleFrom(
+//                     primary: Colors.green.shade600,
+//                   ),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     _showScheduleForm(agronomist);
+//                   },
+//                   child: Text('Schedule'),
+//                   style: ElevatedButton.styleFrom(
+//                     primary: Colors.blue.shade600,
+//                   ),
+//                 ),
+//               ],
 //             ),
 //           ],
 //         ),
@@ -259,50 +169,140 @@
 //     );
 //   }
 
-//   void _selectDate(BuildContext context) async {
-//     DateTime? pickedDate = await showDatePicker(
+//   void _showScheduleForm(Agronomist agronomist) {
+//     showDialog(
 //       context: context,
-//       initialDate: selectedDate ?? DateTime.now(),
-//       firstDate: DateTime.now(),
-//       lastDate: DateTime(2025),
+//       builder: (BuildContext context) {
+//         return StatefulBuilder(
+//           builder: (context, setState) {
+//             return AlertDialog(
+//               title: Text('Schedule Consultation with ${agronomist.name}'),
+//               content: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 children: [
+//                   _buildTextField(
+//                     label: 'Disease Name',
+//                     icon: Icons.local_hospital,
+//                     onChanged: (value) {
+//                       setState(() {
+//                         diseaseName = value;
+//                       });
+//                     },
+//                   ),
+//                   SizedBox(height: 10),
+//                   _buildDatePickerField(setState),
+//                   SizedBox(height: 10),
+//                   _buildTimePickerField(setState),
+//                 ],
+//               ),
+//               actions: [
+//                 TextButton(
+//                   onPressed: () => Navigator.of(context).pop(),
+//                   child: Text('Cancel'),
+//                 ),
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     if (diseaseName.isNotEmpty &&
+//                         selectedDate != null &&
+//                         selectedTime != null) {
+//                       // Schedule consultation logic
+//                       Navigator.of(context).pop();
+//                       _showConfirmationDialog(agronomist);
+//                     } else {
+//                       _showErrorDialog('Please fill all the fields.');
+//                     }
+//                   },
+//                   child: Text('Schedule'),
+//                 ),
+//               ],
+//             );
+//           },
+//         );
+//       },
 //     );
-//     if (pickedDate != null) {
-//       setState(() {
-//         selectedDate = pickedDate;
-//       });
-//     }
 //   }
 
-//   void _selectTime(BuildContext context) async {
-//     TimeOfDay? pickedTime = await showTimePicker(
-//       context: context,
-//       initialTime: selectedTime ?? TimeOfDay.now(),
+//   Widget _buildTextField({
+//     required String label,
+//     required IconData icon,
+//     required ValueChanged<String> onChanged,
+//   }) {
+//     return TextField(
+//       onChanged: onChanged,
+//       decoration: InputDecoration(
+//         labelText: label,
+//         border: OutlineInputBorder(),
+//         prefixIcon: Icon(icon, color: Colors.green),
+//       ),
 //     );
-//     if (pickedTime != null) {
-//       setState(() {
-//         selectedTime = pickedTime;
-//       });
-//     }
 //   }
 
-//   void _showConfirmationDialog() {
+//   Widget _buildDatePickerField(StateSetter setState) {
+//     return TextField(
+//       readOnly: true,
+//       onTap: () async {
+//         DateTime? pickedDate = await showDatePicker(
+//           context: context,
+//           initialDate: selectedDate ?? DateTime.now(),
+//           firstDate: DateTime.now(),
+//           lastDate: DateTime(2025),
+//         );
+//         if (pickedDate != null) {
+//           setState(() {
+//             selectedDate = pickedDate;
+//           });
+//         }
+//       },
+//       decoration: InputDecoration(
+//         labelText: 'Select Date',
+//         border: OutlineInputBorder(),
+//         prefixIcon: Icon(Icons.calendar_today, color: Colors.green),
+//         hintText: selectedDate != null
+//             ? '${selectedDate!.toLocal()}'.split(' ')[0]
+//             : 'Pick a Date',
+//       ),
+//     );
+//   }
+
+//   Widget _buildTimePickerField(StateSetter setState) {
+//     return TextField(
+//       readOnly: true,
+//       onTap: () async {
+//         TimeOfDay? pickedTime = await showTimePicker(
+//           context: context,
+//           initialTime: selectedTime ?? TimeOfDay.now(),
+//         );
+//         if (pickedTime != null) {
+//           setState(() {
+//             selectedTime = pickedTime;
+//           });
+//         }
+//       },
+//       decoration: InputDecoration(
+//         labelText: 'Select Time',
+//         border: OutlineInputBorder(),
+//         prefixIcon: Icon(Icons.access_time, color: Colors.green),
+//         hintText: selectedTime != null
+//             ? '${selectedTime!.hour}:${selectedTime!.minute}'
+//             : 'Pick a Time',
+//       ),
+//     );
+//   }
+
+//   void _showConfirmationDialog(Agronomist agronomist) {
 //     showDialog(
 //       context: context,
 //       builder: (BuildContext context) {
 //         return AlertDialog(
-//           title: Text('Confirmation'),
-//           content: SingleChildScrollView(
-//             child: ListBody(
-//               children: [
-//                 Text('Consultation Scheduled!'),
-//                 SizedBox(height: 10),
-//                 Text('Disease: $diseaseName'),
-//                 Text('Region: $selectedRegion'),
-//                 Text(
-//                     'Date: ${selectedDate?.toLocal().toString().split(' ')[0]}'),
-//                 Text('Time: ${selectedTime?.hour}:${selectedTime?.minute}'),
-//               ],
-//             ),
+//           title: Text('Schedule Confirmed'),
+//           content: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Text('Disease: $diseaseName'),
+//               Text('Date: ${selectedDate?.toLocal()}'),
+//               Text('Time: ${selectedTime?.hour}:${selectedTime?.minute}'),
+//               Text('Consultation with ${agronomist.name} confirmed.'),
+//             ],
 //           ),
 //           actions: [
 //             TextButton(
@@ -338,12 +338,12 @@
 //       context: context,
 //       builder: (BuildContext context) {
 //         return AlertDialog(
-//           title: Text('Consultation with ${agronomist.name}'),
-//           content: Text('Mobile: ${agronomist.mobile}'),
+//           title: Text('Consult ${agronomist.name}'),
+//           content: Text('Contact: ${agronomist.mobile}'),
 //           actions: [
 //             TextButton(
 //               onPressed: () => Navigator.of(context).pop(),
-//               child: Text('Close'),
+//               child: Text('OK'),
 //             ),
 //           ],
 //         );
@@ -359,6 +359,8 @@
 //   Agronomist({required this.name, required this.mobile});
 // }
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ScheduleConsultationScreen extends StatefulWidget {
   const ScheduleConsultationScreen({Key? key}) : super(key: key);
@@ -375,25 +377,74 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
   String? selectedRegion;
   String diseaseName = '';
 
-  // Hardcoded dataset for agronomists based on regions
-  final Map<String, List<Agronomist>> agronomistsByRegion = {
-    'Pune': [
-      Agronomist(name: 'Dr. A', mobile: '1234567890'),
-      Agronomist(name: 'Dr. D', mobile: '2345678901'),
-    ],
-    'Mumbai': [
-      Agronomist(name: 'Dr. B', mobile: '0987654321'),
-      Agronomist(name: 'Dr. E', mobile: '3456789012'),
-    ],
-    'Jalgaon': [
-      Agronomist(name: 'Dr. C', mobile: '1122334455'),
-      Agronomist(name: 'Dr. F', mobile: '4567890123'),
-    ],
-  };
+  // This will hold the agronomists fetched from the API based on region
+  final Map<String, List<Agronomist>> agronomistsByRegion = {};
 
   List<Agronomist> get selectedAgronomists {
     return agronomistsByRegion[selectedRegion] ?? [];
   }
+
+  List<Agronomist> agronomists = [];
+
+  Future<void> fetchAgronomists(String address) async {
+    final url = Uri.parse(
+        'http://192.168.97.193:8081/agronomist/api/v1/getByAddress/$address');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        print(url);
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        List<Agronomist> agronomists = (jsonResponse['agronomists'] as List)
+            .map((data) => Agronomist.fromJson(data))
+            .toList();
+
+        setState(() {
+          agronomistsByRegion[address] =
+              agronomists; // Update the agronomistsByRegion map
+        });
+      } else {
+        // Handle the error
+        print('Failed to fetch agronomists: ${response.statusCode}');
+        _showErrorDialog('Failed to load agronomists.');
+      }
+    } catch (e) {
+      // Handle any exceptions
+      print('Error: $e');
+      _showErrorDialog('An error occurred while fetching agronomists.');
+    }
+  }
+
+  // void fetchAgronomists(String address) async {
+  //   final String url =
+  //       'http://10.0.2.2:8081/agronomist/api/v1/getByAddress/Pune';
+  //   final Dio dio;
+
+  //   dio = Dio(BaseOptions(
+  //     connectTimeout: Duration(seconds: 50), // 5 seconds
+  //     receiveTimeout: Duration(seconds: 30), // Optional: 3 seconds
+  //   ));
+
+  //   try {
+  //     Response response = await dio.get(url);
+
+  //     if (response.statusCode == 200) {
+  //       List<Agronomist> fetchedAgronomists =
+  //           (response.data['agronomists'] as List)
+  //               .map((data) => Agronomist.fromJson(data))
+  //               .toList();
+
+  //       setState(() {
+  //         agronomists = fetchedAgronomists;
+  //       });
+  //     } else {
+  //       print('Failed to fetch agronomists: ${response.statusCode}');
+  //     }
+  //   } on DioError catch (e) {
+  //     print('Error: ${e.message}');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -408,8 +459,6 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(height: 20),
-
-            // Title
             Text(
               'Select a Date, Time & Provide Details',
               textAlign: TextAlign.center,
@@ -420,8 +469,6 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
               ),
             ),
             SizedBox(height: 20),
-
-            // Region Selection Dropdown
             _buildDropdownField(
               value: selectedRegion,
               hint: 'Select Region',
@@ -429,13 +476,15 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
               onChanged: (value) {
                 setState(() {
                   selectedRegion = value;
+                  // Fetch agronomists when region is selected
+                  if (selectedRegion != null) {
+                    fetchAgronomists(selectedRegion!);
+                  }
                 });
               },
               icon: Icons.location_on,
             ),
             SizedBox(height: 20),
-
-            // Agronomist List
             selectedRegion != null && selectedAgronomists.isNotEmpty
                 ? _buildAgronomistList()
                 : Center(child: Text('No Agronomists Available')),
@@ -498,13 +547,12 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
               ),
             ),
             SizedBox(height: 8),
-            Text('Mobile: ${agronomist.mobile}'), // Fixed typo here
+            Text('Mobile: ${agronomist.mobile}'),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Handle consult button click
                     _showConsultationDialog(agronomist);
                   },
                   child: Text('Consult'),
@@ -526,6 +574,31 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
           ],
         ),
       ),
+    );
+  }
+
+  void _showConsultationDialog(Agronomist agronomist) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Consult with ${agronomist.name}'),
+          content: Text('You can discuss your issues with ${agronomist.name}.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Handle consultation confirmation logic here (e.g., make API call)
+                Navigator.of(context).pop();
+              },
+              child: Text('Confirm'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -654,14 +727,14 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Schedule Confirmed'),
+          title: Text('Consultation Scheduled'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('Disease: $diseaseName'),
-              Text('Date: ${selectedDate?.toLocal()}'),
-              Text('Time: ${selectedTime?.hour}:${selectedTime?.minute}'),
-              Text('Consultation with ${agronomist.name} confirmed.'),
+              Text('Date: ${selectedDate!.toLocal()}'.split(' ')[0]),
+              Text('Time: ${selectedTime!.hour}:${selectedTime!.minute}'),
+              Text('With: ${agronomist.name}'),
             ],
           ),
           actions: [
@@ -693,28 +766,28 @@ class _ScheduleConsultationScreenState extends State<ScheduleConsultationScreen>
     );
   }
 
-  void _showConsultationDialog(Agronomist agronomist) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Consult ${agronomist.name}'),
-          content: Text('Contact: ${agronomist.mobile}'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
   }
 }
 
 class Agronomist {
+  final int agronomistId;
   final String name;
   final String mobile;
 
-  Agronomist({required this.name, required this.mobile});
+  Agronomist({
+    required this.agronomistId,
+    required this.name,
+    required this.mobile,
+  });
+
+  factory Agronomist.fromJson(Map<String, dynamic> json) {
+    return Agronomist(
+      agronomistId: json['agronomistId'],
+      name: json['agronomistName'],
+      mobile: json['mobileNo'],
+    );
+  }
 }

@@ -1,128 +1,6 @@
-// // import 'package:flutter/material.dart';
-
-// // class SignUpScreen extends StatelessWidget {
-// //   const SignUpScreen({Key? key}) : super(key: key);
-
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       body: Container(
-// //         decoration: BoxDecoration(
-// //           gradient: LinearGradient(
-// //             colors: [
-// //               Colors.green.shade300,
-// //               Colors.green.shade700,
-// //             ],
-// //             begin: Alignment.topLeft,
-// //             end: Alignment.bottomRight,
-// //           ),
-// //         ),
-// //         child: Center(
-// //           child: SingleChildScrollView(
-// //             child: Column(
-// //               mainAxisAlignment: MainAxisAlignment.center,
-// //               children: [
-// //                 // Logo with Animation
-// //                 AnimatedContainer(
-// //                   duration: Duration(seconds: 1),
-// //                   curve: Curves.easeInOut,
-// //                   width: 100,
-// //                   height: 100,
-// //                   child: Image.network(
-// //                     'https://www.pngplay.com/wp-content/uploads/6/Agriculture-Logo-Clipart-PNG.png',
-// //                   ),
-// //                 ),
-// //                 SizedBox(height: 20),
-
-// //                 // Sign Up Box
-// //                 Container(
-// //                   width: 300,
-// //                   padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-// //                   decoration: BoxDecoration(
-// //                     color: Colors.white,
-// //                     borderRadius: BorderRadius.circular(12),
-// //                     boxShadow: [
-// //                       BoxShadow(
-// //                         color: Colors.black.withOpacity(0.2),
-// //                         blurRadius: 10,
-// //                         offset: Offset(0, 5),
-// //                       ),
-// //                     ],
-// //                   ),
-// //                   child: Column(
-// //                     children: [
-// //                       // Sign Up Text
-// //                       Text(
-// //                         'Sign Up',
-// //                         style: TextStyle(
-// //                           fontSize: 24,
-// //                           fontWeight: FontWeight.bold,
-// //                           color: Colors.green.shade700,
-// //                         ),
-// //                       ),
-// //                       SizedBox(height: 20),
-
-// //                       // Username Field
-// //                       TextField(
-// //                         decoration: InputDecoration(
-// //                           labelText: 'Username',
-// //                           border: OutlineInputBorder(
-// //                             borderRadius: BorderRadius.circular(8),
-// //                           ),
-// //                         ),
-// //                       ),
-// //                       SizedBox(height: 16),
-
-// //                       // Mobile Number Field
-// //                       TextField(
-// //                         decoration: InputDecoration(
-// //                           labelText: 'Mobile Number',
-// //                           border: OutlineInputBorder(
-// //                             borderRadius: BorderRadius.circular(8),
-// //                           ),
-// //                         ),
-// //                       ),
-// //                       SizedBox(height: 16),
-
-// //                       // Password Field
-// //                       TextField(
-// //                         obscureText: true,
-// //                         decoration: InputDecoration(
-// //                           labelText: 'Password',
-// //                           border: OutlineInputBorder(
-// //                             borderRadius: BorderRadius.circular(8),
-// //                           ),
-// //                         ),
-// //                       ),
-// //                       SizedBox(height: 20),
-
-// //                       // Sign Up Button
-// //                       ElevatedButton(
-// //                         onPressed: () {
-// //                           // Handle sign up
-// //                         },
-// //                         child: Text('Sign Up'),
-// //                         style: ElevatedButton.styleFrom(
-// //                           primary: Colors.green.shade600,
-// //                           padding: EdgeInsets.symmetric(vertical: 12),
-// //                           shape: RoundedRectangleBorder(
-// //                             borderRadius: BorderRadius.circular(8),
-// //                           ),
-// //                         ),
-// //                       ),
-// //                     ],
-// //                   ),
-// //                 ),
-// //               ],
-// //             ),
-// //           ),
-// //         ),
-// //       ),
-// //     );
-// //   }
-// // }
 // import 'package:flutter/material.dart';
-// import 'otpverify.dart'; // Make sure to create this screen
+// import 'package:http/http.dart' as http; // Import the http package
+// import 'dart:convert'; // For encoding and decoding JSON
 // import 'login.dart'; // Make sure to create this screen
 
 // class SignUpScreen extends StatefulWidget {
@@ -138,8 +16,11 @@
 //   late Animation<double> _logoAnimation;
 //   late Animation<double> _boxAnimation;
 
+//   final TextEditingController _usernameController = TextEditingController();
 //   final TextEditingController _mobileController = TextEditingController();
+//   final TextEditingController _addressController = TextEditingController();
 //   bool _isMobileValid = true;
+//   bool _isRegistering = false;
 
 //   @override
 //   void initState() {
@@ -163,7 +44,9 @@
 //   @override
 //   void dispose() {
 //     _controller.dispose();
+//     _usernameController.dispose();
 //     _mobileController.dispose();
+//     _addressController.dispose();
 //     super.dispose();
 //   }
 
@@ -172,20 +55,83 @@
 //     return mobileRegExp.hasMatch(input);
 //   }
 
-//   void _navigateToVerifyOtp() {
-//     if (_validateMobileNumber(_mobileController.text)) {
-//       // Check if the widget is mounted before navigating
-//       if (mounted) {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//               builder: (context) =>
-//                   VerifyOtpScreen()), // Replace with your OTP screen
+//   // Function to handle user registration
+//   Future<void> _registerUser() async {
+//     setState(() {
+//       _isRegistering = true;
+//     });
+
+//     final String username = _usernameController.text.trim();
+//     final String mobileNo = _mobileController.text.trim();
+//     final String address = _addressController.text.trim();
+
+//     // Validate input fields
+//     if (username.isEmpty ||
+//         !_validateMobileNumber(mobileNo) ||
+//         address.isEmpty) {
+//       setState(() {
+//         _isMobileValid = _validateMobileNumber(mobileNo);
+//         _isRegistering = false;
+//       });
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Please fill in all fields correctly.'),
+//         ),
+//       );
+//       return;
+//     }
+
+//     final url = Uri.parse('http://192.168.97.193:8081/api/v1/user/register');
+
+//     // Create the request payload
+//     final Map<String, String> requestPayload = {
+//       'username': username,
+//       'mobileNo': mobileNo,
+//       'address': address,
+//     };
+
+//     try {
+//       // Make the POST request
+//       final response = await http.post(
+//         url,
+//         headers: {'Content-Type': 'application/json'},
+//         body: json.encode(requestPayload),
+//       );
+
+//       if (response.statusCode == 200) {
+//         // Successful registration
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text('Registration successful!'),
+//           ),
+//         );
+
+//         // Navigate to Login screen
+//         if (mounted) {
+//           Navigator.pushReplacement(
+//             context,
+//             MaterialPageRoute(
+//               builder: (context) => LoginScreen(),
+//             ),
+//           );
+//         }
+//       } else {
+//         // Failed registration
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text('Registration failed. ${response.body}'),
+//           ),
 //         );
 //       }
-//     } else {
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(
+//           content: Text('Error: $e'),
+//         ),
+//       );
+//     } finally {
 //       setState(() {
-//         _isMobileValid = false;
+//         _isRegistering = false; // Hide loading indicator
 //       });
 //     }
 //   }
@@ -194,11 +140,15 @@
 //     if (mounted) {
 //       Navigator.pushReplacement(
 //         context,
-//         MaterialPageRoute(
-//             builder: (context) =>
-//                 LoginScreen()), // Replace with your login screen
+//         MaterialPageRoute(builder: (context) => LoginScreen()),
 //       );
 //     }
+//   }
+
+//   bool _isAllFieldsValid() {
+//     return _usernameController.text.trim().isNotEmpty &&
+//         _validateMobileNumber(_mobileController.text.trim()) &&
+//         _addressController.text.trim().isNotEmpty;
 //   }
 
 //   @override
@@ -208,7 +158,7 @@
 //       backgroundColor: Colors.green.shade100,
 //       body: SafeArea(
 //         child: SingleChildScrollView(
-//           physics: ClampingScrollPhysics(),
+//           physics: const ClampingScrollPhysics(),
 //           child: Padding(
 //             padding: const EdgeInsets.symmetric(horizontal: 16.0),
 //             child: Column(
@@ -247,6 +197,20 @@
 //                         ),
 //                         SizedBox(height: 30),
 
+//                         // Username Field
+//                         TextField(
+//                           controller: _usernameController,
+//                           decoration: InputDecoration(
+//                             labelText: 'Username',
+//                             border: OutlineInputBorder(),
+//                             prefixIcon: Icon(Icons.person, color: Colors.green),
+//                           ),
+//                           onChanged: (input) {
+//                             setState(() {}); // Check if fields are valid
+//                           },
+//                         ),
+//                         SizedBox(height: 20),
+
 //                         // Mobile Number Field
 //                         TextField(
 //                           controller: _mobileController,
@@ -261,26 +225,48 @@
 //                           onChanged: (input) {
 //                             setState(() {
 //                               _isMobileValid = _validateMobileNumber(input);
-//                             });
+//                             }); // Check if fields are valid
 //                           },
 //                         ),
 //                         SizedBox(height: 20),
 
-//                         // Next Button
+//                         // Address Field
+//                         TextField(
+//                           controller: _addressController,
+//                           decoration: InputDecoration(
+//                             labelText: 'Address',
+//                             border: OutlineInputBorder(),
+//                             prefixIcon: Icon(Icons.home, color: Colors.green),
+//                           ),
+//                           onChanged: (input) {
+//                             setState(() {}); // Check if fields are valid
+//                           },
+//                         ),
+//                         SizedBox(height: 20),
+
+//                         // Register Button
 //                         ElevatedButton(
-//                           onPressed: _navigateToVerifyOtp,
+//                           onPressed: _isAllFieldsValid() && !_isRegistering
+//                               ? _registerUser
+//                               : null,
 //                           style: ElevatedButton.styleFrom(
-//                             primary: Colors.green.shade700,
+//                             primary: _isAllFieldsValid()
+//                                 ? Colors.green.shade700
+//                                 : Colors.green.shade400, // Change button color
 //                             padding: EdgeInsets.symmetric(vertical: 15),
 //                           ),
-//                           child: Text(
-//                             'Next',
-//                             style: TextStyle(
-//                               color: Colors.white,
-//                               fontSize: 18,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
+//                           child: _isRegistering
+//                               ? CircularProgressIndicator(
+//                                   color: Colors.white,
+//                                 )
+//                               : Text(
+//                                   'Register',
+//                                   style: TextStyle(
+//                                     color: Colors.white,
+//                                     fontSize: 18,
+//                                     fontWeight: FontWeight.bold,
+//                                   ),
+//                                 ),
 //                         ),
 //                         SizedBox(height: 20),
 
@@ -329,8 +315,10 @@
 //     );
 //   }
 // }
+
 import 'package:flutter/material.dart';
-import 'otpverify.dart'; // Make sure to create this screen
+import 'package:http/http.dart' as http; // Import the http package
+import 'dart:convert'; // For encoding and decoding JSON
 import 'login.dart'; // Make sure to create this screen
 
 class SignUpScreen extends StatefulWidget {
@@ -348,7 +336,9 @@ class _SignUpScreenState extends State<SignUpScreen>
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
   bool _isMobileValid = true;
+  bool _isRegistering = false;
 
   @override
   void initState() {
@@ -374,6 +364,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     _controller.dispose();
     _usernameController.dispose();
     _mobileController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -382,20 +373,83 @@ class _SignUpScreenState extends State<SignUpScreen>
     return mobileRegExp.hasMatch(input);
   }
 
-  void _navigateToVerifyOtp() {
-    if (_validateMobileNumber(_mobileController.text)) {
-      // Check if the widget is mounted before navigating
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  VerifyOtpScreen()), // Replace with your OTP screen
+  // Function to handle user registration
+  Future<void> _registerUser() async {
+    setState(() {
+      _isRegistering = true;
+    });
+
+    final String username = _usernameController.text.trim();
+    final String mobileNo = _mobileController.text.trim();
+    final String address = _addressController.text.trim();
+
+    // Validate input fields
+    if (username.isEmpty ||
+        !_validateMobileNumber(mobileNo) ||
+        address.isEmpty) {
+      setState(() {
+        _isMobileValid = _validateMobileNumber(mobileNo);
+        _isRegistering = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please fill in all fields correctly.'),
+        ),
+      );
+      return;
+    }
+
+    final url = Uri.parse('http://192.168.97.193:8081/api/v1/user/register');
+
+    // Create the request payload
+    final Map<String, String> requestPayload = {
+      'username': username,
+      'mobileNo': mobileNo,
+      'address': address,
+    };
+
+    try {
+      // Make the POST request
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestPayload),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful registration
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration successful!'),
+          ),
+        );
+
+        // Navigate to Login screen
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginScreen(),
+            ),
+          );
+        }
+      } else {
+        // Failed registration
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration failed. ${response.body}'),
+          ),
         );
       }
-    } else {
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+        ),
+      );
+    } finally {
       setState(() {
-        _isMobileValid = false;
+        _isRegistering = false; // Hide loading indicator
       });
     }
   }
@@ -404,11 +458,15 @@ class _SignUpScreenState extends State<SignUpScreen>
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) =>
-                LoginScreen()), // Replace with your login screen
+        MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     }
+  }
+
+  bool _isAllFieldsValid() {
+    return _usernameController.text.trim().isNotEmpty &&
+        _validateMobileNumber(_mobileController.text.trim()) &&
+        _addressController.text.trim().isNotEmpty;
   }
 
   @override
@@ -418,7 +476,7 @@ class _SignUpScreenState extends State<SignUpScreen>
       backgroundColor: Colors.green.shade100,
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: ClampingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
@@ -439,6 +497,18 @@ class _SignUpScreenState extends State<SignUpScreen>
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.05),
 
+                // Sign Up Text Centered
+                Text(
+                  'Sign Up',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade900,
+                  ),
+                ),
+                SizedBox(height: 30),
+
                 // Sign Up Box and Fields
                 FadeTransition(
                   opacity: _boxAnimation,
@@ -447,16 +517,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade900,
-                          ),
-                        ),
-                        SizedBox(height: 30),
-
                         // Username Field
                         TextField(
                           controller: _usernameController,
@@ -465,6 +525,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.person, color: Colors.green),
                           ),
+                          onChanged: (input) {
+                            setState(() {}); // Check if fields are valid
+                          },
                         ),
                         SizedBox(height: 20),
 
@@ -482,26 +545,48 @@ class _SignUpScreenState extends State<SignUpScreen>
                           onChanged: (input) {
                             setState(() {
                               _isMobileValid = _validateMobileNumber(input);
-                            });
+                            }); // Check if fields are valid
                           },
                         ),
                         SizedBox(height: 20),
 
-                        // Next Button
+                        // Address Field
+                        TextField(
+                          controller: _addressController,
+                          decoration: InputDecoration(
+                            labelText: 'Address',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.home, color: Colors.green),
+                          ),
+                          onChanged: (input) {
+                            setState(() {}); // Check if fields are valid
+                          },
+                        ),
+                        SizedBox(height: 20),
+
+                        // Register Button
                         ElevatedButton(
-                          onPressed: _navigateToVerifyOtp,
+                          onPressed: _isAllFieldsValid() && !_isRegistering
+                              ? _registerUser
+                              : null,
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.green.shade700,
+                            primary: _isAllFieldsValid()
+                                ? Colors.green.shade700
+                                : Colors.green.shade400, // Change button color
                             padding: EdgeInsets.symmetric(vertical: 15),
                           ),
-                          child: Text(
-                            'Next',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: _isRegistering
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  'Register',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         ),
                         SizedBox(height: 20),
 
