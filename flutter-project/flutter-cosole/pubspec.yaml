@@ -34,9 +34,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/Agriculture-Logo-Clipart-PNG.png # Your app's logo
+    - assets/agriAI-logo.png # Your app's logo
     # Uncomment and add any additional assets as needed, like logos or user/weather icons
     - assets\Earth.gif
     - assets\loader.gif
+    - assets\home.jpg
+    - assets\note.jpg
+    - assets\userProfile.jpg
+    - assets\agronomist.jpg
+    - assets\upload.png
+    - assets\camera.png
     # - assets/user.png
     # - assets/weather_icon.png

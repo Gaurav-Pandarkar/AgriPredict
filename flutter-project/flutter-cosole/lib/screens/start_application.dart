@@ -213,7 +213,7 @@ class _StartApplicationState extends State<StartApplication>
                     opacity: 1.0,
                     duration: Duration(seconds: 1),
                     child: Text(
-                      'Welcome to Kisaan Saathee',
+                      'Welcome to AgroAI',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

@@ -241,30 +241,90 @@ class _HomeScreenState extends State<HomeScreen>
         child: Scaffold(
           appBar: AppBar(
             toolbarHeight: 100,
-            backgroundColor: Colors.green[800],
+            backgroundColor:
+                Color(0xFF387F39), // A deep green color for the background
             automaticallyImplyLeading: false,
-            elevation: 5,
+            elevation: 6,
             title: Row(
+              mainAxisAlignment: MainAxisAlignment
+                  .spaceBetween, // Use space-between to prevent overflow
               children: [
-                ClipOval(
-                  child: Image.network(
-                    'https://www.pngplay.com/wp-content/uploads/6/Agriculture-Logo-Clipart-PNG.png',
-                    height: 70,
-                    width: 70,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(width: 10),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  // Wrap this in a Row to handle logo and texts together
                   children: [
-                    Text('AgriPredict',
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
+                    ClipOval(
+                      child: Image.asset(
+                        'assets/agriAI-logo.png',
+                        height: 70,
+                        width: 70,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(width: 15),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'AgroAI',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        SizedBox(
+                            height:
+                                5), // Small space between title and subtitle
+                        Text(
+                          'Smart Crop Management',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300,
+                            color: Color(0xFFFFFFFF), // White for subtitle
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
+                ),
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert,
+                      color: Colors.white), // Three dots icon
+                  onSelected: (value) {
+                    // Handle menu selections
+                    if (value == 'settings') {
+                      // Navigate to settings
+                    } else if (value == 'notifications') {
+                      // Navigate to notifications
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      PopupMenuItem<String>(
+                        value: 'settings',
+                        child: Row(
+                          children: [
+                            Icon(Icons.settings, color: Colors.black),
+                            SizedBox(width: 10),
+                            Text('Settings'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'notifications',
+                        child: Row(
+                          children: [
+                            Icon(Icons.notifications, color: Colors.black),
+                            SizedBox(width: 10),
+                            Text('Notifications'),
+                          ],
+                        ),
+                      ),
+                    ];
+                  },
                 ),
               ],
             ),
@@ -395,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen>
                 SizedBox(height: 10),
 
                 // Image Capture Section
-                 ImageCaptureSection(),
+                ImageCaptureSection(),
               ],
             ),
           ),
