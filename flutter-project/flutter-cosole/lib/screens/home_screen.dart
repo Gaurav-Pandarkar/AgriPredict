@@ -471,396 +471,6 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-//   Future<List<Weather>> fetchWeatherList() async {
-//     // Mocked future for list of weather objects
-//     return [
-//       Weather(cityName: 'Pune', temperature: 22, weatherDescription: 'Rain'),
-//       Weather(cityName: 'Mumbai', temperature: 30, weatherDescription: 'Sunny'),
-//     ];
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return WillPopScope(
-//       onWillPop: () async {
-//         // Return false to prevent navigating back
-//         return false;
-//       },
-//       child: Scaffold(
-//         appBar: AppBar(
-//           toolbarHeight: 100,
-//           backgroundColor: Colors.green[800],
-//           automaticallyImplyLeading: false,
-//           elevation: 5,
-//           title: Row(
-//             children: [
-//               ClipOval(
-//                 child: Image.network(
-//                   'https://www.pngplay.com/wp-content/uploads/6/Agriculture-Logo-Clipart-PNG.png',
-//                   height: 70,
-//                   width: 70,
-//                   fit: BoxFit.cover,
-//                 ),
-//               ),
-//               SizedBox(width: 10),
-//               Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text(
-//                     'AgriPredict',
-//                     style: TextStyle(
-//                         fontSize: 24,
-//                         fontWeight: FontWeight.bold,
-//                         color: Colors.white),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//         body: SingleChildScrollView(
-//           // Enable vertical scrolling
-//           child: Container(
-//             decoration: BoxDecoration(color: Colors.green[100]),
-//             child: Column(
-//               children: [
-//                 SizedBox(height: 8),
-
-//                 GestureDetector(
-//                   onTap: () {},
-//                   onHorizontalDragUpdate: (details) {
-//                     setState(() {
-//                       cropBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
-//                     });
-//                   },
-//                   onHorizontalDragEnd: (details) {
-//                     setState(() {
-//                       cropBoxScale = 1.0;
-//                     });
-//                   },
-//                   child: AnimatedScale(
-//                     scale: cropBoxScale,
-//                     duration: Duration(milliseconds: 200),
-//                     child:
-//                         MajorCropsSection(), // Assuming this is your crop section
-//                   ),
-//                 ),
-//                 SizedBox(height: 20),
-
-//                 // Horizontal scrollable list for weather boxes
-//                 Container(
-//                   height: 120,
-//                   child: FutureBuilder<List<Weather>>(
-//                     future: fetchWeatherList(),
-//                     builder: (context, snapshot) {
-//                       if (snapshot.connectionState == ConnectionState.waiting) {
-//                         return Center(child: CircularProgressIndicator());
-//                       } else if (snapshot.hasError) {
-//                         return Center(child: Text('Error: ${snapshot.error}'));
-//                       } else if (snapshot.hasData) {
-//                         final weatherList = snapshot.data!;
-//                         return ListView.builder(
-//                           scrollDirection: Axis.horizontal,
-//                           itemCount: weatherList.length,
-//                           itemBuilder: (context, index) {
-//                             final weatherData = weatherList[index];
-//                             return Container(
-//                               width: 250,
-//                               height: 100,
-//                               margin: EdgeInsets.symmetric(horizontal: 8),
-//                               padding: EdgeInsets.all(16.0),
-//                               decoration: BoxDecoration(
-//                                 color: Colors.grey[200],
-//                                 borderRadius: BorderRadius.circular(15),
-//                                 border: Border.all(
-//                                   color: Colors.blue,
-//                                   width: 2,
-//                                 ),
-//                                 boxShadow: [
-//                                   BoxShadow(
-//                                     color: Colors.black26,
-//                                     blurRadius: 4,
-//                                     offset: Offset(2, 2),
-//                                   ),
-//                                 ],
-//                               ),
-//                               child: Row(
-//                                 mainAxisAlignment:
-//                                     MainAxisAlignment.spaceEvenly,
-//                                 children: [
-//                                   Image.network(
-//                                     'https://uxwing.com/wp-content/themes/uxwing/download/weather/weather-icon.png',
-//                                     height: 40,
-//                                     width: 40,
-//                                   ),
-//                                   Column(
-//                                     mainAxisAlignment: MainAxisAlignment.center,
-//                                     crossAxisAlignment:
-//                                         CrossAxisAlignment.start,
-//                                     children: [
-//                                       Text(
-//                                         weatherData.cityName,
-//                                         style: TextStyle(
-//                                             fontSize: 20,
-//                                             fontWeight: FontWeight.bold,
-//                                             color: Colors.black87),
-//                                       ),
-//                                       Text(
-//                                         '${weatherData.temperature} °C',
-//                                         style: TextStyle(
-//                                           fontSize: 18,
-//                                           fontWeight: FontWeight.bold,
-//                                           color: Colors.black87,
-//                                         ),
-//                                       ),
-//                                       Text(
-//                                         weatherData.weatherDescription,
-//                                         style: TextStyle(
-//                                           fontSize: 14,
-//                                           color: Colors.black54,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ],
-//                               ),
-//                             );
-//                           },
-//                         );
-//                       } else {
-//                         return Center(child: Text('No data available'));
-//                       }
-//                     },
-//                   ),
-//                 ),
-//                 SizedBox(height: 10),
-
-//                 // Image Capture Section
-//                 ImageCaptureSection(), // Assuming this is your image capture section
-//               ],
-//             ),
-//           ),
-//         ),
-//         bottomNavigationBar: Taskbar(
-//           currentIndex: _currentIndex,
-//           onTap: (index) {
-//             setState(() {
-//               _currentIndex = index;
-//             });
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// animation code below
-//   @override
-//   Widget build(BuildContext context) {
-//     return WillPopScope(
-//       onWillPop: () async {
-//         // Return false to prevent navigating back
-//         return false;
-//       },
-//       child: Scaffold(
-//         appBar: AppBar(
-//           toolbarHeight: 100,
-//           backgroundColor: Colors.green[500],
-//           automaticallyImplyLeading: false,
-//           elevation: 0, // Remove AppBar border
-//           title: Row(
-//             children: [
-//               ClipOval(
-//                 child: Image.network(
-//                   'https://www.pngplay.com/wp-content/uploads/6/Agriculture-Logo-Clipart-PNG.png',
-//                   height: 50, // Smaller logo size
-//                   width: 50, // Smaller logo size
-//                   fit: BoxFit.cover,
-//                 ),
-//               ),
-//               SizedBox(width: 10),
-//               Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Text(
-//                     'AgriPredict',
-//                     style: TextStyle(
-//                       fontSize: 24,
-//                       fontWeight: FontWeight.bold,
-//                       color: Colors.white,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//         body: Container(
-//           decoration: BoxDecoration(color: Colors.green[100]),
-//           child: Stack(
-//             children: [
-//               // Curved Container Background with Slide Transition
-//               SlideTransition(
-//                 position: Tween<Offset>(
-//                   begin: Offset(0, -1), // Start above the screen
-//                   end: Offset(0, 0), // End at its original position
-//                 ).animate(CurvedAnimation(
-//                   parent: _animationController,
-//                   curve: Curves.easeOut,
-//                 )),
-//                 child: ClipPath(
-//                   clipper: BottomWaveClipper(),
-//                   child: Container(
-//                     height: 300, // Adjust height as needed
-//                     color: Colors.green[500],
-//                   ),
-//                 ),
-//               ),
-//               Column(
-//                 children: [
-//                   SizedBox(height: 20), // Space above the curve
-
-//                   GestureDetector(
-//                     onTap: () {},
-//                     onHorizontalDragUpdate: (details) {
-//                       setState(() {
-//                         cropBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
-//                       });
-//                     },
-//                     onHorizontalDragEnd: (details) {
-//                       setState(() {
-//                         cropBoxScale = 1.0;
-//                       });
-//                     },
-//                     child: AnimatedScale(
-//                       scale: cropBoxScale,
-//                       duration: Duration(milliseconds: 200),
-//                       child: MajorCropsSection(),
-//                     ),
-//                   ),
-//                   SizedBox(height: 20),
-
-//                   GestureDetector(
-//                     onTap: fetchWeather,
-//                     onHorizontalDragUpdate: (details) {
-//                       setState(() {
-//                         weatherBoxScale = details.delta.dx > 0 ? 1.1 : 1.0;
-//                       });
-//                     },
-//                     onHorizontalDragEnd: (details) {
-//                       setState(() {
-//                         weatherBoxScale = 1.0;
-//                       });
-//                     },
-//                     child: AnimatedScale(
-//                       scale: weatherBoxScale,
-//                       duration: Duration(milliseconds: 200),
-//                       child: isLoading
-//                           ? CircularProgressIndicator()
-//                           : FutureBuilder<Weather>(
-//                               future: weather,
-//                               builder: (context, snapshot) {
-//                                 if (snapshot.connectionState ==
-//                                     ConnectionState.waiting) {
-//                                   return CircularProgressIndicator();
-//                                 } else if (snapshot.hasError) {
-//                                   return Text('Error: ${snapshot.error}');
-//                                 } else if (snapshot.hasData) {
-//                                   final weatherData = snapshot.data!;
-//                                   return AnimatedContainer(
-//                                     duration: Duration(milliseconds: 300),
-//                                     curve: Curves.easeInOut,
-//                                     width: 250,
-//                                     height: 100,
-//                                     padding: EdgeInsets.all(16.0),
-//                                     decoration: BoxDecoration(
-//                                       color: Colors.grey[200],
-//                                       borderRadius: BorderRadius.circular(15),
-//                                       border: Border.all(
-//                                         color: Colors.blue,
-//                                         width: 2,
-//                                       ),
-//                                       boxShadow: [
-//                                         BoxShadow(
-//                                           color: Colors.black26,
-//                                           blurRadius: 4,
-//                                           offset: Offset(2, 2),
-//                                         ),
-//                                       ],
-//                                     ),
-//                                     child: Row(
-//                                       mainAxisAlignment:
-//                                           MainAxisAlignment.spaceEvenly,
-//                                       children: [
-//                                         Image.network(
-//                                           'https://uxwing.com/wp-content/themes/uxwing/download/weather/weather-icon.png',
-//                                           height: 40,
-//                                           width: 40,
-//                                         ),
-//                                         Column(
-//                                           mainAxisAlignment:
-//                                               MainAxisAlignment.center,
-//                                           crossAxisAlignment:
-//                                               CrossAxisAlignment.start,
-//                                           children: [
-//                                             Text(
-//                                               weatherData.cityName,
-//                                               style: TextStyle(
-//                                                   fontSize: 20,
-//                                                   fontWeight: FontWeight.bold,
-//                                                   color: Colors.black87),
-//                                             ),
-//                                             Text(
-//                                               '${weatherData.temperature} °C',
-//                                               style: TextStyle(
-//                                                 fontSize: 18,
-//                                                 fontWeight: FontWeight.bold,
-//                                                 color: Colors.black87,
-//                                               ),
-//                                             ),
-//                                             Text(
-//                                               weatherData.weatherDescription,
-//                                               style: TextStyle(
-//                                                 fontSize: 14,
-//                                                 color: Colors.black54,
-//                                               ),
-//                                             ),
-//                                           ],
-//                                         ),
-//                                       ],
-//                                     ),
-//                                   );
-//                                 } else {
-//                                   return Text('No data available');
-//                                 }
-//                               },
-//                             ),
-//                     ),
-//                   ),
-//                   SizedBox(height: 10),
-
-//                   // Image Capture Section
-//                   ImageCaptureSection(),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ),
-//         bottomNavigationBar: Taskbar(
-//           currentIndex: _currentIndex,
-//           onTap: (index) {
-//             setState(() {
-//               _currentIndex = index;
-//             });
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 // Custom ClipPath for the curved background
 class BottomWaveClipper extends CustomClipper<Path> {
   @override
@@ -881,32 +491,31 @@ class BottomWaveClipper extends CustomClipper<Path> {
 }
 
 class CropCard extends StatelessWidget {
-  final String imageUrl;
+  final Widget image; // Accepts an Image widget
 
-  CropCard({required this.imageUrl});
+  CropCard({required this.image});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.white, // Inner background color
-          border: Border.all(
-            color: Colors.blueAccent, // Border color
-            width: 2,
+    return Container(
+      width: 80, // Smaller width
+      height: 80, // Smaller height
+      decoration: BoxDecoration(
+        color: Colors.white, // White background color
+        shape: BoxShape.circle, // Circular shape
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 5,
+            offset: Offset(0, 2),
           ),
-        ),
-        child: ClipOval(
-          child: Image.network(
-            imageUrl,
-            height: 80,
-            width: 80,
-            fit: BoxFit.cover,
-          ),
-        ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(
+            40.0), // Half of width/height for circular display
+        child: image, // Display the image passed to CropCard
       ),
     );
   }
@@ -925,17 +534,16 @@ class MajorCropsSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               CropCard(
-                imageUrl:
-                    "https://media.istockphoto.com/vectors/vector-bunch-with-outline-soybean-or-soy-bean-plant-with-ripe-pods-vector-id1057630574?k=6&m=1057630574&s=612x612&w=0&h=8Q9Yjru4kFSkJ3Nx_2HW1ltsIIUl6cbK12s0mGbDHrM=",
+                image: Image.asset('assets/soyabin.png',
+                    fit: BoxFit.cover), // Local asset for Soybean
               ),
               CropCard(
-                imageUrl:
-                    "https://media.istockphoto.com/id/486069279/vector/cotton.jpg?s=612x612&w=0&k=20&c=R5jY1zRMrJU_ikfYkKOtw-5r0PtRS4QmnfSFXv6xTq0=",
-                // "https://cdn-icons-png.flaticon.com/512/3174/3174960.png",
+                image: Image.asset('assets/cotton.png',
+                    fit: BoxFit.cover), // Local asset for Cotton
               ),
               CropCard(
-                imageUrl:
-                    "https://static.vecteezy.com/system/resources/previews/032/329/721/large_2x/sugarcane-transparent-background-ai-generative-free-png.png",
+                image: Image.asset('assets/sugarcane.png',
+                    fit: BoxFit.cover), // Local asset for Sugarcane
               ),
             ],
           ),

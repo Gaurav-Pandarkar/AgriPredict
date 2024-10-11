@@ -11,7 +11,9 @@ dependencies:
     sdk: flutter
   font_awesome_flutter: ^10.3.0 # Font Awesome icons for UI
   # intl: ^0.18.0 # For internationalization and formatting
-  intl: ^0.17.0
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.0
 
   #  image_picker: ^0.8.4+10
   # permission_handler: ^10.0.0 # Optional for animated text effects in the app
@@ -23,13 +25,25 @@ dependencies:
   # firebase_core: ^1.10.6 # Older version compatible with lower SDK
   # firebase_auth: ^3.3.0
 
+flutter_icons:
+  android: true
+  ios: false
+  image_path: "assets/agriAI-logo.png"
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
   http: ^0.13.5
+  flutter_launcher_icons: ^0.13.1
 
   geolocator: ^9.0.2
+  intl_utils: ^2.0.0
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/agriAI-logo.png"
 
 flutter:
   uses-material-design: true
@@ -44,5 +58,8 @@ flutter:
     - assets\agronomist.jpg
     - assets\upload.png
     - assets\camera.png
+    - assets\sugarcane.png
+    - assets\soyabin.png
+    - assets\cotton.png
     # - assets/user.png
     # - assets/weather_icon.png

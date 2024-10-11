@@ -66,7 +66,7 @@ class _ImageCaptureSectionState extends State<ImageCaptureSection> {
     var request = http.MultipartRequest(
       'POST',
       Uri.parse(
-          'http://192.168.97.238:5000/identify'), // Replace with your API endpoint
+          'https://59c9-103-174-140-112.ngrok-free.app/identify'), // Replace with your API endpoint
     );
 
     // Add the image to the request
@@ -156,7 +156,7 @@ class _ImageCaptureSectionState extends State<ImageCaptureSection> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(); // Close the dialog
                 },
                 child: Text(
                   'OK',
@@ -171,123 +171,46 @@ class _ImageCaptureSectionState extends State<ImageCaptureSection> {
         );
       },
     );
-
-    // Automatically dismiss the dialog after 3 seconds
-    Future.delayed(Duration(seconds: 3), () {
-      Navigator.of(context).pop();
-    });
   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: double.infinity,
-//       decoration: BoxDecoration(
-//         border: Border.all(color: Colors.blueAccent, width: 2),
-//         borderRadius: BorderRadius.circular(15),
-//         color: Colors.white,
-//       ),
-//       padding: EdgeInsets.all(16.0),
-//       margin: EdgeInsets.all(16.0),
-//       child: Column(
-//         children: [
-//           Text(
-//             'Capture or Upload Image',
-//             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//           ),
-//           SizedBox(height: 20),
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//             children: [
-//               _buildImageButton(
-//                 iconUrl:
-//                     'https://cdn-icons-png.flaticon.com/512/1042/1042390.png',
-//                 label: 'Camera',
-//                 onPressed: _pickImageFromCamera,
-//               ),
-//               _buildImageButton(
-//                 iconUrl:
-//                     'https://icons.veryicon.com/png/o/business/general-office-icon/general-upload-file.png',
-//                 label: 'Upload',
-//                 onPressed: _pickImageFromGallery,
-//               ),
-//             ],
-//           ),
-//           SizedBox(height: 20),
-//           if (_isLoading) CircularProgressIndicator(), // Show loading spinner
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildImageButton({
-//     required String iconUrl,
-//     required String label,
-//     required VoidCallback onPressed,
-//   }) {
-//     return GestureDetector(
-//       onTap: onPressed,
-//       child: AnimatedContainer(
-//         duration: Duration(milliseconds: 300),
-//         decoration: BoxDecoration(
-//           color: Colors.blueAccent,
-//           borderRadius: BorderRadius.circular(10),
-//         ),
-//         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-//         child: Row(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Image.network(
-//               iconUrl,
-//               height: 24,
-//               width: 24,
-//             ),
-//             SizedBox(width: 10),
-//             Text(
-//               label,
-//               style: TextStyle(color: Colors.white, fontSize: 18),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.green[700]!, // Darker green for better visibility
-          width: 2,
-        ),
         borderRadius: BorderRadius.circular(15),
         color: Colors.white,
+        border: Border.all(color: Colors.blue, width: 2), // Added blue border
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2), // Shadow color
+            blurRadius: 10,
+            offset: Offset(0, 5), // Shadow offset
+          ),
+        ],
       ),
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start, // Align items to the start
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Capture or Upload Image',
             style: TextStyle(
-              fontSize: 26, // Increased font size for better readability
+              fontSize: 22, // Reduced font size for better fitting
               fontWeight: FontWeight.bold,
-              color: Colors.green[900], // Dark green color for the text
-              letterSpacing: 1.2, // Added letter spacing for better readability
+              color: Colors.black, // Text color set to black
+              letterSpacing: 1.2,
             ),
+            maxLines: 1, // Ensure text is in one line
+            overflow:
+                TextOverflow.ellipsis, // Handle overflow if text is too long
           ),
           SizedBox(height: 20),
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceAround, // Adjusted alignment
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               Expanded(
-                // Make buttons flexible
                 child: _buildImageButton(
                   iconUrl:
                       'assets/camera.png', // Use local asset for the camera icon
@@ -295,9 +218,8 @@ class _ImageCaptureSectionState extends State<ImageCaptureSection> {
                   onPressed: _pickImageFromCamera,
                 ),
               ),
-              SizedBox(width: 10), // Reduced space between buttons
+              SizedBox(width: 10),
               Expanded(
-                // Make buttons flexible
                 child: _buildImageButton(
                   iconUrl:
                       'assets/upload.png', // Use local asset for the upload icon
@@ -311,11 +233,11 @@ class _ImageCaptureSectionState extends State<ImageCaptureSection> {
           if (_isLoading) ...[
             Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.green), // Spinner color
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(Colors.teal), // Spinner color
               ),
             ),
-            SizedBox(height: 20), // Additional spacing after the spinner
+            SizedBox(height: 20),
           ],
         ],
       ),
@@ -332,35 +254,33 @@ class _ImageCaptureSectionState extends State<ImageCaptureSection> {
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
         decoration: BoxDecoration(
-          color: Colors.green[600], // Softer green tone for buttons
+          color: Colors.teal[600], // Changed button color to teal
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.green.withOpacity(0.3),
+              color: Colors.teal.withOpacity(0.3),
               blurRadius: 8,
               offset: Offset(0, 4),
             ),
           ],
         ),
-        padding: EdgeInsets.symmetric(
-            horizontal: 20, vertical: 12), // Adjusted padding for balance
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment:
-              MainAxisAlignment.center, // Center the icon and text
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               iconUrl,
-              height: 28, // Larger icons for better visibility
+              height: 28,
               width: 28,
             ),
-            SizedBox(width: 8), // Reduced space between icon and text
+            SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                color: Colors.white, // White text for contrast
-                fontSize: 18,
-                fontWeight: FontWeight.w600, // Semi-bold for better clarity
+                color: Colors.white, // Keep text color white for contrast
+                fontSize: 16, // Reduced font size to fit better
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
